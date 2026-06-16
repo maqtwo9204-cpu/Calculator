@@ -6,155 +6,44 @@
   <title>ハートフルレター作成 | TOD'S 御殿場</title>
   <style>
     * { box-sizing: border-box; margin: 0; padding: 0; }
-
-    body {
-      min-height: 100vh;
-      background: #efe9e1;
-      font-family: 'Hiragino Mincho ProN', 'Yu Mincho', 'Noto Serif JP', serif;
-    }
-
-    header {
-      background: #16130f;
-      padding: 22px 0;
-      text-align: center;
-    }
-    header .brand {
-      color: #c0a16b;
-      letter-spacing: 0.45em;
-      font-size: 11px;
-      margin-bottom: 8px;
-    }
-    header h1 {
-      color: #f5f0e8;
-      font-size: 16px;
-      font-weight: 400;
-      letter-spacing: 0.18em;
-    }
-    header .sub {
-      color: #8a8175;
-      font-size: 10px;
-      letter-spacing: 0.1em;
-      margin-top: 8px;
-    }
-
-    .container {
-      max-width: 640px;
-      margin: 0 auto;
-      padding: 22px 16px 48px;
-    }
-
-    .card {
-      background: #fff;
-      border-radius: 2px;
-      padding: 26px 22px;
-      margin-bottom: 18px;
-      box-shadow: 0 1px 6px rgba(0,0,0,0.07);
-    }
-
-    .section-label {
-      font-size: 11px;
-      color: #9a8f7d;
-      letter-spacing: 0.2em;
-      margin-bottom: 20px;
-      font-family: 'Hiragino Kaku Gothic ProN', sans-serif;
-    }
-
+    body { min-height: 100vh; background: #efe9e1; font-family: 'Hiragino Mincho ProN', 'Yu Mincho', 'Noto Serif JP', serif; }
+    header { background: #16130f; padding: 22px 0; text-align: center; }
+    header .brand { color: #c0a16b; letter-spacing: 0.45em; font-size: 11px; margin-bottom: 8px; }
+    header h1 { color: #f5f0e8; font-size: 16px; font-weight: 400; letter-spacing: 0.18em; }
+    header .sub { color: #8a8175; font-size: 10px; letter-spacing: 0.1em; margin-top: 8px; }
+    .container { max-width: 640px; margin: 0 auto; padding: 22px 16px 48px; }
+    .card { background: #fff; border-radius: 2px; padding: 26px 22px; margin-bottom: 18px; box-shadow: 0 1px 6px rgba(0,0,0,0.07); }
+    .section-label { font-size: 11px; color: #9a8f7d; letter-spacing: 0.2em; margin-bottom: 20px; font-family: 'Hiragino Kaku Gothic ProN', sans-serif; }
     .row { display: flex; gap: 10px; margin-bottom: 16px; }
     .row > div { flex: 1; }
-
     .field { margin-bottom: 16px; }
     .field:last-child { margin-bottom: 0; }
-
-    label {
-      display: block;
-      font-size: 11px;
-      color: #5a5045;
-      margin-bottom: 6px;
-      letter-spacing: 0.05em;
-      font-family: 'Hiragino Kaku Gothic ProN', sans-serif;
-    }
-
-    input[type="text"],
-    input[type="date"],
-    textarea {
-      width: 100%;
-      border: 1px solid #d8d2c8;
-      border-radius: 2px;
-      padding: 10px 12px;
-      font-size: 13px;
-      color: #222;
-      outline: none;
-      font-family: 'Hiragino Mincho ProN', 'Yu Mincho', serif;
-      background: #fcfbf9;
-    }
+    label { display: block; font-size: 11px; color: #5a5045; margin-bottom: 6px; letter-spacing: 0.05em; font-family: 'Hiragino Kaku Gothic ProN', sans-serif; }
+    .label-hint { font-size: 10px; color: #b3a892; margin-left: 6px; }
+    input[type="text"], input[type="password"], input[type="date"], textarea {
+      width: 100%; border: 1px solid #d8d2c8; border-radius: 2px; padding: 10px 12px;
+      font-size: 13px; color: #222; outline: none;
+      font-family: 'Hiragino Mincho ProN', 'Yu Mincho', serif; background: #fcfbf9; }
     textarea { resize: vertical; }
-
-    .date-hint {
-      font-size: 11px;
-      margin-top: 6px;
-      font-family: 'Hiragino Kaku Gothic ProN', sans-serif;
-    }
+    .date-hint { font-size: 11px; margin-top: 6px; font-family: 'Hiragino Kaku Gothic ProN', sans-serif; }
     .hint-recent { color: #5a8a5a; }
-    .hint-past   { color: #a8743a; }
-
-    /* Preview */
-    .preview-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 18px;
-    }
-
-    .btn-reset {
-      background: none;
-      border: 1px solid #d0c8ba;
-      border-radius: 2px;
-      padding: 7px 14px;
-      font-size: 11px;
-      color: #8a8175;
-      cursor: pointer;
-      font-family: 'Hiragino Kaku Gothic ProN', sans-serif;
-    }
-    .btn-copy {
-      border: none;
-      border-radius: 2px;
-      padding: 7px 16px;
-      font-size: 11px;
-      color: #fff;
-      cursor: pointer;
-      letter-spacing: 0.05em;
-      background: #16130f;
-      transition: background 0.2s;
-      font-family: 'Hiragino Kaku Gothic ProN', sans-serif;
-    }
+    .hint-past { color: #a8743a; }
+    .api-box { background: #faf8f4; border: 1px solid #ece6dc; border-radius: 2px; padding: 14px; margin-bottom: 18px; }
+    .api-box .api-title { font-size: 11px; color: #8a8175; margin-bottom: 8px; font-family: 'Hiragino Kaku Gothic ProN', sans-serif; }
+    .api-box .api-note { font-size: 10px; color: #b3a892; margin-top: 6px; line-height: 1.6; font-family: 'Hiragino Kaku Gothic ProN', sans-serif; }
+    .btn-generate { width: 100%; border: none; border-radius: 2px; padding: 13px; font-size: 13px; color: #fff; cursor: pointer; letter-spacing: 0.1em; background: #16130f; transition: opacity 0.2s; font-family: 'Hiragino Kaku Gothic ProN', sans-serif; }
+    .btn-generate:disabled { opacity: 0.4; cursor: not-allowed; }
+    .preview-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 18px; }
+    .btn-reset { background: none; border: 1px solid #d0c8ba; border-radius: 2px; padding: 7px 14px; font-size: 11px; color: #8a8175; cursor: pointer; font-family: 'Hiragino Kaku Gothic ProN', sans-serif; }
+    .btn-copy { border: none; border-radius: 2px; padding: 7px 16px; font-size: 11px; color: #fff; cursor: pointer; letter-spacing: 0.05em; background: #16130f; transition: background 0.2s; font-family: 'Hiragino Kaku Gothic ProN', sans-serif; }
     .btn-copy.copied { background: #5a8a5a; }
-
-    .subject-bar {
-      background: #faf8f4;
-      border: 1px solid #ece6dc;
-      border-radius: 2px;
-      padding: 12px 14px;
-      margin-bottom: 16px;
-      font-family: 'Hiragino Kaku Gothic ProN', sans-serif;
-    }
-    .subject-bar .subject-label {
-      font-size: 10px;
-      color: #b3a892;
-      margin-right: 8px;
-    }
-    .subject-bar .subject-text {
-      font-size: 12px;
-      color: #333;
-    }
-
-    #preview {
-      font-size: 13px;
-      line-height: 2.1;
-      color: #2a2620;
-      white-space: pre-wrap;
-    }
-
     .btn-row { display: flex; gap: 8px; }
+    .subject-bar { background: #faf8f4; border: 1px solid #ece6dc; border-radius: 2px; padding: 12px 14px; margin-bottom: 16px; font-family: 'Hiragino Kaku Gothic ProN', sans-serif; }
+    .subject-bar .subject-label { font-size: 10px; color: #b3a892; margin-right: 8px; }
+    .subject-bar .subject-text { font-size: 12px; color: #333; }
+    #preview { font-size: 13px; line-height: 2.1; color: #2a2620; white-space: pre-wrap; min-height: 40px; }
+    .status { font-size: 11px; margin-top: 10px; font-family: 'Hiragino Kaku Gothic ProN', sans-serif; }
+    .loading { color: #9a8f7d; font-style: italic; }
   </style>
 </head>
 <body>
@@ -167,50 +56,48 @@
 
 <div class="container">
 
-  <!-- 入力カード -->
-  <div class="card">
-    <p class="section-label">お客様情報</p>
-
-    <div class="row">
-      <div>
-        <label>姓</label>
-        <input type="text" id="lastName" placeholder="田中" oninput="generate()" />
-      </div>
-      <div>
-        <label>名</label>
-        <input type="text" id="firstName" placeholder="さくら" oninput="generate()" />
-      </div>
-    </div>
-
-    <div class="field">
-      <label>購入日</label>
-      <input type="date" id="purchaseDate" onchange="generate()" />
-      <p class="date-hint" id="dateHint"></p>
-    </div>
-
-    <div class="field">
-      <label>購入商品名</label>
-      <input type="text" id="product" placeholder="ディーババッグ" oninput="generate()" />
-    </div>
-
-    <div class="field">
-      <label>お客様の印象・雰囲気</label>
-      <input type="text" id="impression" placeholder="華やかでありながら品のある雰囲気" oninput="generate()" />
-    </div>
-
-    <div class="field">
-      <label>来店エピソード（その日の様子）</label>
-      <textarea id="episode" rows="3" placeholder="また、結婚記念日のご旅行の途中にお立ち寄りいただき、本当にありがとうございました。ご夫婦で楽しそうにご覧いただいていたのが印象的でした。" oninput="generate()"></textarea>
-    </div>
-
-    <div class="field">
-      <label>担当スタッフ名</label>
-      <input type="text" id="staffName" placeholder="佐藤" oninput="generate()" />
+  <div class="api-box">
+    <div class="api-title">Claude APIキー</div>
+    <input type="password" id="apiKey" placeholder="sk-ant-..." />
+    <div class="api-note">
+      ※ お客様の印象・エピソードをAIが自然な文章に整えるために使用します。<br>
+      ※ キーはこの画面内でのみ使用され、どこにも保存・送信されません。
     </div>
   </div>
 
-  <!-- プレビューカード -->
   <div class="card">
+    <p class="section-label">お客様情報</p>
+    <div class="row">
+      <div><label>姓</label><input type="text" id="lastName" placeholder="田中" /></div>
+      <div><label>名</label><input type="text" id="firstName" placeholder="さくら" /></div>
+    </div>
+    <div class="field">
+      <label>購入日</label>
+      <input type="date" id="purchaseDate" onchange="updateDateHint()" />
+      <p class="date-hint" id="dateHint"></p>
+    </div>
+    <div class="field">
+      <label>購入商品名</label>
+      <input type="text" id="product" placeholder="ディーババッグ" />
+    </div>
+    <div class="field">
+      <label>お客様の印象・雰囲気<span class="label-hint">（メモ書きでOK）</span></label>
+      <input type="text" id="impression" placeholder="例：明るい / おしゃれ / 上品" />
+    </div>
+    <div class="field">
+      <label>来店エピソード<span class="label-hint">（メモ書きでOK）</span></label>
+      <textarea id="episode" rows="3" placeholder="例：夫婦で来店、記念日、楽しそうに選んでた"></textarea>
+    </div>
+    <div class="field">
+      <label>担当スタッフ名</label>
+      <input type="text" id="staffName" placeholder="佐藤" />
+    </div>
+  </div>
+
+  <button class="btn-generate" id="genBtn" onclick="generateWithAI()">AIで文章を整えて作成する</button>
+  <p class="status" id="status"></p>
+
+  <div class="card" style="margin-top:18px;">
     <div class="preview-header">
       <p class="section-label" style="margin-bottom:0">プレビュー</p>
       <div class="btn-row">
@@ -218,12 +105,10 @@
         <button class="btn-copy" id="copyBtn" onclick="copyText()">全文コピー</button>
       </div>
     </div>
-
     <div class="subject-bar">
       <span class="subject-label">件名</span>
       <span class="subject-text" id="subjectText"></span>
     </div>
-
     <div id="preview"></div>
   </div>
 
@@ -232,17 +117,31 @@
 <script>
   const STORE = "TOD'S 御殿場プレミアムアウトレット店";
   const STORE_SHORT = "TOD'S 御殿場プレミアムアウトレット";
+  const SUBJECT = `ご来店ありがとうございました。（${STORE_SHORT}）`;
+  document.getElementById('subjectText').textContent = SUBJECT;
 
   function getDaysPassed(dateStr) {
     if (!dateStr) return null;
-    const purchase = new Date(dateStr);
-    const today = new Date();
-    purchase.setHours(0,0,0,0);
-    today.setHours(0,0,0,0);
-    return Math.floor((today - purchase) / (1000*60*60*24));
+    const p = new Date(dateStr); const t = new Date();
+    p.setHours(0,0,0,0); t.setHours(0,0,0,0);
+    return Math.floor((t - p) / (1000*60*60*24));
   }
 
-  function generate() {
+  function updateDateHint() {
+    const days = getDaysPassed(document.getElementById('purchaseDate').value);
+    const hint = document.getElementById('dateHint');
+    if (days === null) { hint.textContent = ''; return; }
+    if (days <= 3) {
+      hint.textContent = `購入から${days}日経過 → 「この度は〜ございます」`;
+      hint.className = 'date-hint hint-recent';
+    } else {
+      hint.textContent = `購入から${days}日経過 → 「先日は〜ございました」`;
+      hint.className = 'date-hint hint-past';
+    }
+  }
+
+  async function generateWithAI() {
+    const apiKey = document.getElementById('apiKey').value.trim();
     const lastName  = document.getElementById('lastName').value.trim();
     const firstName = document.getElementById('firstName').value.trim();
     const dateStr   = document.getElementById('purchaseDate').value;
@@ -250,77 +149,95 @@
     const impression= document.getElementById('impression').value.trim();
     const episode   = document.getElementById('episode').value.trim();
     const staff     = document.getElementById('staffName').value.trim();
+    const status = document.getElementById('status');
+    const genBtn = document.getElementById('genBtn');
 
-    const name = [lastName, firstName].filter(Boolean).join(' ');
+    if (!apiKey) { status.textContent = '⚠ APIキーを入力してください。'; status.style.color = '#a8743a'; return; }
+    if (!lastName || !product) { status.textContent = '⚠ 姓・購入商品名は必須です。'; status.style.color = '#a8743a'; return; }
+
     const days = getDaysPassed(dateStr);
+    const greeting = (days !== null && days <= 3)
+      ? `この度は${STORE}をご利用いただき誠にありがとうございます。`
+      : `先日は${STORE}をご利用いただき誠にありがとうございました。`;
 
-    // 日数ヒント
-    const hint = document.getElementById('dateHint');
-    if (days !== null) {
-      if (days <= 3) {
-        hint.textContent = `購入から${days}日経過 → 「この度は〜ございます」`;
-        hint.className = 'date-hint hint-recent';
-      } else {
-        hint.textContent = `購入から${days}日経過 → 「先日は〜ございました」`;
-        hint.className = 'date-hint hint-past';
-      }
-    } else {
-      hint.textContent = '';
-    }
+    genBtn.disabled = true;
+    status.textContent = '';
+    document.getElementById('preview').innerHTML = '<span class="loading">AIが文章を整えています…</span>';
 
-    // 冒頭文
-    let greeting = '';
-    if (days !== null) {
-      if (days <= 3) {
-        greeting = `この度は${STORE}をご利用いただき誠にありがとうございます。`;
-      } else {
-        greeting = `先日は${STORE}をご利用いただき誠にありがとうございました。`;
-      }
-    } else {
-      greeting = '（購入日を入力してください）';
-    }
+    const prompt = `あなたはTOD'Sの販売スタッフです。来店されたお客様へ送るハートフルレター（お礼メール）の本文を作成してください。
 
-    const customerName = name ? `${name}様` : '○○ ○○様';
-    const productLine  = product
-      ? `お買い上げいただきました${product}は、${lastName || '○○'}様の${impression || '雰囲気'}にとてもよくお似合いでした。`
-      : '（商品名を入力してください）';
-    const episodeLine  = episode || 'また、ご来店いただき、本当にありがとうございました。';
-    const staffLine    = staff || '○○';
-    const lastNameLine = lastName || '○○';
+【お客様情報】
+- お客様の姓：${lastName}
+- 購入商品：${product}
+- お客様の印象（メモ）：${impression || '（記載なし）'}
+- 来店エピソード（メモ）：${episode || '（記載なし）'}
 
-    const subject = `ご来店ありがとうございました。（${STORE_SHORT}）`;
+【文体ルール（厳守）】
+- 文頭に「・」や箇条書き記号は絶対に使わない。自然な段落の文章にする。
+- 堅すぎず、温かみのある丁寧な日本語にする。
+- 以下の3つの要素を、この順番で、各1〜2文で書く：
+  1：購入商品（${product}）を、お客様の印象・雰囲気と結びつけて「お似合いでした」と伝える文。
+  2：来店エピソードを情景が浮かぶように自然な文にする。「また、」で始めてもよい。
+  3：「末永くご愛用いただけることを願っております。」で締める。
+- メモが雑でも、上品で自然な接客日本語に整えること。
+- 出力は上記3要素の本文のみ。挨拶文・宛名・署名・件名は一切含めない。説明や前置きも書かない。
 
-    const body =
+本文のみを出力してください。`;
+
+    try {
+      const res = await fetch("https://api.anthropic.com/v1/messages", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "x-api-key": apiKey,
+          "anthropic-version": "2023-06-01",
+          "anthropic-dangerous-direct-browser-access": "true"
+        },
+        body: JSON.stringify({
+          model: "claude-sonnet-4-6",
+          max_tokens: 1000,
+          messages: [{ role: "user", content: prompt }]
+        })
+      });
+
+      if (!res.ok) { throw new Error(`APIエラー (${res.status})`); }
+
+      const data = await res.json();
+      const aiBody = data.content.filter(b => b.type === "text").map(b => b.text).join("\n").trim();
+      const customerName = [lastName, firstName].filter(Boolean).join(' ') + '様';
+      const fullBody =
 `${customerName}
 
 ${greeting}
 
-${productLine}
-${episodeLine}
-末永くご愛用いただけることを願っております。
+${aiBody}
 
-ご不明な点や気になる点がございましたら、私、${staffLine}までお気軽にお問い合わせください。
+ご不明な点や気になる点がございましたら、私、${staff || '○○'}までお気軽にお問い合わせください。
 
-また、${lastNameLine}様にお会いできることを心よりお待ち申し上げております。
+また、${lastName}様にお会いできることを心よりお待ち申し上げております。
 
 
 ${STORE}`;
 
-    document.getElementById('subjectText').textContent = subject;
-    document.getElementById('preview').textContent = body;
-
-    // 全文保存
-    window._fullText = `件名：${subject}\n\n\n${body}`;
+      document.getElementById('preview').textContent = fullBody;
+      window._fullText = `件名：${SUBJECT}\n\n\n${fullBody}`;
+      status.textContent = '✓ 作成しました。';
+      status.style.color = '#5a8a5a';
+    } catch (e) {
+      document.getElementById('preview').textContent = '';
+      status.textContent = '⚠ ' + e.message + '（APIキーや通信状況をご確認ください）';
+      status.style.color = '#a8743a';
+    } finally {
+      genBtn.disabled = false;
+    }
   }
 
   function resetForm() {
-    ['lastName','firstName','purchaseDate','product','impression','episode','staffName']
-      .forEach(id => {
-        const el = document.getElementById(id);
-        el.value = '';
-      });
+    ['lastName','firstName','purchaseDate','product','impression','episode','staffName'].forEach(id => document.getElementById(id).value = '');
     document.getElementById('dateHint').textContent = '';
-    generate();
+    document.getElementById('preview').textContent = '';
+    document.getElementById('status').textContent = '';
+    window._fullText = '';
   }
 
   function copyText() {
@@ -329,15 +246,9 @@ ${STORE}`;
       const btn = document.getElementById('copyBtn');
       btn.textContent = 'コピーしました ✓';
       btn.classList.add('copied');
-      setTimeout(() => {
-        btn.textContent = '全文コピー';
-        btn.classList.remove('copied');
-      }, 2000);
+      setTimeout(() => { btn.textContent = '全文コピー'; btn.classList.remove('copied'); }, 2000);
     });
   }
-
-  // 初期表示
-  generate();
 </script>
 </body>
 </html>
