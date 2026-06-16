@@ -1,0 +1,343 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>ハートフルレター作成 | TOD'S 御殿場</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      min-height: 100vh;
+      background: #efe9e1;
+      font-family: 'Hiragino Mincho ProN', 'Yu Mincho', 'Noto Serif JP', serif;
+    }
+
+    header {
+      background: #16130f;
+      padding: 22px 0;
+      text-align: center;
+    }
+    header .brand {
+      color: #c0a16b;
+      letter-spacing: 0.45em;
+      font-size: 11px;
+      margin-bottom: 8px;
+    }
+    header h1 {
+      color: #f5f0e8;
+      font-size: 16px;
+      font-weight: 400;
+      letter-spacing: 0.18em;
+    }
+    header .sub {
+      color: #8a8175;
+      font-size: 10px;
+      letter-spacing: 0.1em;
+      margin-top: 8px;
+    }
+
+    .container {
+      max-width: 640px;
+      margin: 0 auto;
+      padding: 22px 16px 48px;
+    }
+
+    .card {
+      background: #fff;
+      border-radius: 2px;
+      padding: 26px 22px;
+      margin-bottom: 18px;
+      box-shadow: 0 1px 6px rgba(0,0,0,0.07);
+    }
+
+    .section-label {
+      font-size: 11px;
+      color: #9a8f7d;
+      letter-spacing: 0.2em;
+      margin-bottom: 20px;
+      font-family: 'Hiragino Kaku Gothic ProN', sans-serif;
+    }
+
+    .row { display: flex; gap: 10px; margin-bottom: 16px; }
+    .row > div { flex: 1; }
+
+    .field { margin-bottom: 16px; }
+    .field:last-child { margin-bottom: 0; }
+
+    label {
+      display: block;
+      font-size: 11px;
+      color: #5a5045;
+      margin-bottom: 6px;
+      letter-spacing: 0.05em;
+      font-family: 'Hiragino Kaku Gothic ProN', sans-serif;
+    }
+
+    input[type="text"],
+    input[type="date"],
+    textarea {
+      width: 100%;
+      border: 1px solid #d8d2c8;
+      border-radius: 2px;
+      padding: 10px 12px;
+      font-size: 13px;
+      color: #222;
+      outline: none;
+      font-family: 'Hiragino Mincho ProN', 'Yu Mincho', serif;
+      background: #fcfbf9;
+    }
+    textarea { resize: vertical; }
+
+    .date-hint {
+      font-size: 11px;
+      margin-top: 6px;
+      font-family: 'Hiragino Kaku Gothic ProN', sans-serif;
+    }
+    .hint-recent { color: #5a8a5a; }
+    .hint-past   { color: #a8743a; }
+
+    /* Preview */
+    .preview-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 18px;
+    }
+
+    .btn-reset {
+      background: none;
+      border: 1px solid #d0c8ba;
+      border-radius: 2px;
+      padding: 7px 14px;
+      font-size: 11px;
+      color: #8a8175;
+      cursor: pointer;
+      font-family: 'Hiragino Kaku Gothic ProN', sans-serif;
+    }
+    .btn-copy {
+      border: none;
+      border-radius: 2px;
+      padding: 7px 16px;
+      font-size: 11px;
+      color: #fff;
+      cursor: pointer;
+      letter-spacing: 0.05em;
+      background: #16130f;
+      transition: background 0.2s;
+      font-family: 'Hiragino Kaku Gothic ProN', sans-serif;
+    }
+    .btn-copy.copied { background: #5a8a5a; }
+
+    .subject-bar {
+      background: #faf8f4;
+      border: 1px solid #ece6dc;
+      border-radius: 2px;
+      padding: 12px 14px;
+      margin-bottom: 16px;
+      font-family: 'Hiragino Kaku Gothic ProN', sans-serif;
+    }
+    .subject-bar .subject-label {
+      font-size: 10px;
+      color: #b3a892;
+      margin-right: 8px;
+    }
+    .subject-bar .subject-text {
+      font-size: 12px;
+      color: #333;
+    }
+
+    #preview {
+      font-size: 13px;
+      line-height: 2.1;
+      color: #2a2620;
+      white-space: pre-wrap;
+    }
+
+    .btn-row { display: flex; gap: 8px; }
+  </style>
+</head>
+<body>
+
+<header>
+  <p class="brand">TOD'S</p>
+  <h1>ハートフルレター 作成</h1>
+  <p class="sub">御殿場プレミアムアウトレット店</p>
+</header>
+
+<div class="container">
+
+  <!-- 入力カード -->
+  <div class="card">
+    <p class="section-label">お客様情報</p>
+
+    <div class="row">
+      <div>
+        <label>姓</label>
+        <input type="text" id="lastName" placeholder="田中" oninput="generate()" />
+      </div>
+      <div>
+        <label>名</label>
+        <input type="text" id="firstName" placeholder="さくら" oninput="generate()" />
+      </div>
+    </div>
+
+    <div class="field">
+      <label>購入日</label>
+      <input type="date" id="purchaseDate" onchange="generate()" />
+      <p class="date-hint" id="dateHint"></p>
+    </div>
+
+    <div class="field">
+      <label>購入商品名</label>
+      <input type="text" id="product" placeholder="ディーババッグ" oninput="generate()" />
+    </div>
+
+    <div class="field">
+      <label>お客様の印象・雰囲気</label>
+      <input type="text" id="impression" placeholder="華やかでありながら品のある雰囲気" oninput="generate()" />
+    </div>
+
+    <div class="field">
+      <label>来店エピソード（その日の様子）</label>
+      <textarea id="episode" rows="3" placeholder="また、結婚記念日のご旅行の途中にお立ち寄りいただき、本当にありがとうございました。ご夫婦で楽しそうにご覧いただいていたのが印象的でした。" oninput="generate()"></textarea>
+    </div>
+
+    <div class="field">
+      <label>担当スタッフ名</label>
+      <input type="text" id="staffName" placeholder="佐藤" oninput="generate()" />
+    </div>
+  </div>
+
+  <!-- プレビューカード -->
+  <div class="card">
+    <div class="preview-header">
+      <p class="section-label" style="margin-bottom:0">プレビュー</p>
+      <div class="btn-row">
+        <button class="btn-reset" onclick="resetForm()">リセット</button>
+        <button class="btn-copy" id="copyBtn" onclick="copyText()">全文コピー</button>
+      </div>
+    </div>
+
+    <div class="subject-bar">
+      <span class="subject-label">件名</span>
+      <span class="subject-text" id="subjectText"></span>
+    </div>
+
+    <div id="preview"></div>
+  </div>
+
+</div>
+
+<script>
+  const STORE = "TOD'S 御殿場プレミアムアウトレット店";
+  const STORE_SHORT = "TOD'S 御殿場プレミアムアウトレット";
+
+  function getDaysPassed(dateStr) {
+    if (!dateStr) return null;
+    const purchase = new Date(dateStr);
+    const today = new Date();
+    purchase.setHours(0,0,0,0);
+    today.setHours(0,0,0,0);
+    return Math.floor((today - purchase) / (1000*60*60*24));
+  }
+
+  function generate() {
+    const lastName  = document.getElementById('lastName').value.trim();
+    const firstName = document.getElementById('firstName').value.trim();
+    const dateStr   = document.getElementById('purchaseDate').value;
+    const product   = document.getElementById('product').value.trim();
+    const impression= document.getElementById('impression').value.trim();
+    const episode   = document.getElementById('episode').value.trim();
+    const staff     = document.getElementById('staffName').value.trim();
+
+    const name = [lastName, firstName].filter(Boolean).join(' ');
+    const days = getDaysPassed(dateStr);
+
+    // 日数ヒント
+    const hint = document.getElementById('dateHint');
+    if (days !== null) {
+      if (days <= 3) {
+        hint.textContent = `購入から${days}日経過 → 「この度は〜ございます」`;
+        hint.className = 'date-hint hint-recent';
+      } else {
+        hint.textContent = `購入から${days}日経過 → 「先日は〜ございました」`;
+        hint.className = 'date-hint hint-past';
+      }
+    } else {
+      hint.textContent = '';
+    }
+
+    // 冒頭文
+    let greeting = '';
+    if (days !== null) {
+      if (days <= 3) {
+        greeting = `この度は${STORE}をご利用いただき誠にありがとうございます。`;
+      } else {
+        greeting = `先日は${STORE}をご利用いただき誠にありがとうございました。`;
+      }
+    } else {
+      greeting = '（購入日を入力してください）';
+    }
+
+    const customerName = name ? `${name}様` : '○○ ○○様';
+    const productLine  = product
+      ? `お買い上げいただきました${product}は、${lastName || '○○'}様の${impression || '雰囲気'}にとてもよくお似合いでした。`
+      : '（商品名を入力してください）';
+    const episodeLine  = episode || 'また、ご来店いただき、本当にありがとうございました。';
+    const staffLine    = staff || '○○';
+    const lastNameLine = lastName || '○○';
+
+    const subject = `ご来店ありがとうございました。（${STORE_SHORT}）`;
+
+    const body =
+`${customerName}
+
+${greeting}
+
+${productLine}
+${episodeLine}
+末永くご愛用いただけることを願っております。
+
+ご不明な点や気になる点がございましたら、私、${staffLine}までお気軽にお問い合わせください。
+
+また、${lastNameLine}様にお会いできることを心よりお待ち申し上げております。
+
+
+${STORE}`;
+
+    document.getElementById('subjectText').textContent = subject;
+    document.getElementById('preview').textContent = body;
+
+    // 全文保存
+    window._fullText = `件名：${subject}\n\n\n${body}`;
+  }
+
+  function resetForm() {
+    ['lastName','firstName','purchaseDate','product','impression','episode','staffName']
+      .forEach(id => {
+        const el = document.getElementById(id);
+        el.value = '';
+      });
+    document.getElementById('dateHint').textContent = '';
+    generate();
+  }
+
+  function copyText() {
+    if (!window._fullText) return;
+    navigator.clipboard.writeText(window._fullText).then(() => {
+      const btn = document.getElementById('copyBtn');
+      btn.textContent = 'コピーしました ✓';
+      btn.classList.add('copied');
+      setTimeout(() => {
+        btn.textContent = '全文コピー';
+        btn.classList.remove('copied');
+      }, 2000);
+    });
+  }
+
+  // 初期表示
+  generate();
+</script>
+</body>
+</html>
