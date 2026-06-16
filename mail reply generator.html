@@ -1,0 +1,637 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>✉ メール返信文ジェネレーター</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --bg:           #F7F8FC;
+    --surface:      #FFFFFF;
+    --surface-alt:  #EEF1FB;
+    --border:       #DDE1F0;
+    --accent:       #3B5BDB;
+    --accent-light: #E8EDFF;
+    --accent-dark:  #2545C0;
+    --text:         #1A1D2E;
+    --text-sub:     #5A607A;
+    --text-muted:   #9298B0;
+    --success:      #2F9E44;
+    --success-bg:   #EBFBEE;
+    --danger:       #E03131;
+    --danger-bg:    #FFF5F5;
+  }
+
+  body {
+    font-family: 'Inter', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    padding: 32px 16px 64px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .container { width: 100%; max-width: 720px; }
+
+  /* ヘッダー */
+  .header { margin-bottom: 32px; }
+  .eyebrow {
+    font-size: 11px; font-weight: 600; letter-spacing: .12em;
+    text-transform: uppercase; color: var(--accent); margin-bottom: 8px;
+  }
+  .header h1 { font-size: 28px; font-weight: 700; line-height: 1.25; margin-bottom: 8px; }
+  .header p  { font-size: 14px; color: var(--text-sub); line-height: 1.6; }
+
+  /* カード */
+  .card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 28px;
+    margin-bottom: 20px;
+    box-shadow: 0 2px 12px rgba(59,91,219,.06);
+  }
+  .card-title {
+    font-size: 13px; font-weight: 600; color: var(--text-sub);
+    letter-spacing: .04em; margin-bottom: 16px;
+    display: flex; align-items: center; gap: 8px;
+  }
+
+  /* ドロップゾーン */
+  .drop-zone {
+    border: 2px dashed var(--border);
+    border-radius: 12px; padding: 40px 24px;
+    text-align: center; cursor: pointer;
+    transition: all .2s; background: var(--bg);
+    position: relative;
+  }
+  .drop-zone:hover, .drop-zone.dragging {
+    border-color: var(--accent); background: var(--accent-light);
+  }
+  .drop-zone input {
+    position: absolute; inset: 0; opacity: 0;
+    cursor: pointer; width: 100%; height: 100%;
+  }
+  .drop-icon  { font-size: 36px; margin-bottom: 12px; }
+  .drop-label { font-size: 15px; font-weight: 600; margin-bottom: 6px; }
+  .drop-sub   { font-size: 13px; color: var(--text-muted); }
+
+  /* プレビュー */
+  #preview-wrap { display: none; }
+  #preview-img {
+    width: 100%; max-height: 280px; object-fit: contain;
+    border-radius: 10px; border: 1px solid var(--border);
+    margin-bottom: 12px; background: var(--bg);
+  }
+
+  /* オプション */
+  .options-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+  .option-group label {
+    display: block; font-size: 12px; font-weight: 600;
+    color: var(--text-sub); margin-bottom: 6px;
+  }
+  .option-group select,
+  .option-group input,
+  .option-group textarea {
+    width: 100%; padding: 10px 12px;
+    border: 1px solid var(--border); border-radius: 8px;
+    font-size: 14px; font-family: 'Inter', sans-serif;
+    color: var(--text); background: var(--bg); outline: none;
+    transition: border-color .15s; resize: vertical;
+  }
+  .option-group select:focus,
+  .option-group input:focus,
+  .option-group textarea:focus {
+    border-color: var(--accent); background: var(--surface);
+  }
+  .option-group.full { grid-column: 1 / -1; }
+
+  /* ボタン */
+  .btn {
+    display: inline-flex; align-items: center; gap: 8px;
+    padding: 12px 22px; border-radius: 10px;
+    font-size: 14px; font-weight: 600; font-family: 'Inter', sans-serif;
+    cursor: pointer; transition: all .2s; border: none;
+  }
+  .btn-primary {
+    background: var(--accent); color: #fff;
+    width: 100%; justify-content: center; font-size: 15px; padding: 14px;
+    box-shadow: 0 4px 14px rgba(59,91,219,.3);
+  }
+  .btn-primary:hover:not(:disabled) {
+    background: var(--accent-dark); transform: translateY(-1px);
+    box-shadow: 0 6px 18px rgba(59,91,219,.35);
+  }
+  .btn-primary:disabled { opacity: .5; cursor: not-allowed; transform: none; }
+  .btn-secondary {
+    background: var(--surface-alt); color: var(--text-sub);
+    font-size: 13px; padding: 8px 14px;
+  }
+  .btn-secondary:hover { background: var(--border); color: var(--text); }
+  .btn-ghost {
+    background: transparent; color: var(--accent);
+    padding: 8px 14px; font-size: 13px;
+  }
+  .btn-ghost:hover { background: var(--accent-light); }
+
+  /* 結果 */
+  .result-tabs {
+    display: flex; gap: 4px; margin-bottom: 16px;
+    background: var(--bg); padding: 4px; border-radius: 10px;
+  }
+  .tab {
+    flex: 1; padding: 8px 12px; font-size: 13px; font-weight: 500;
+    font-family: 'Inter', sans-serif; background: transparent;
+    border: none; border-radius: 7px; cursor: pointer;
+    color: var(--text-muted); transition: all .15s;
+  }
+  .tab.active {
+    background: var(--surface); color: var(--accent); font-weight: 600;
+    box-shadow: 0 1px 4px rgba(0,0,0,.08);
+  }
+  .reply-box {
+    background: var(--bg); border: 1px solid var(--border);
+    border-radius: 10px; padding: 16px; min-height: 200px;
+    font-size: 14px; line-height: 1.75; white-space: pre-wrap; word-break: break-word;
+  }
+  .copy-bar {
+    display: flex; justify-content: flex-end;
+    gap: 8px; margin-top: 12px; flex-wrap: wrap;
+  }
+  .badge-copied {
+    display: inline-flex; align-items: center; gap: 4px;
+    font-size: 12px; font-weight: 600; color: var(--success);
+    background: var(--success-bg); padding: 6px 12px; border-radius: 8px;
+  }
+  .badge-drafted {
+    display: inline-flex; align-items: center; gap: 4px;
+    font-size: 12px; font-weight: 600; color: #1967D2;
+    background: #E8F0FE; padding: 6px 12px; border-radius: 8px;
+  }
+  .btn-gmail {
+    background: #1967D2; color: #fff;
+    padding: 8px 16px; font-size: 13px;
+    box-shadow: 0 2px 8px rgba(25,103,210,.25);
+  }
+  .btn-gmail:hover:not(:disabled) {
+    background: #1558B0; transform: translateY(-1px);
+  }
+  .btn-gmail:disabled { opacity: .5; cursor: not-allowed; }
+
+  /* Gmail認証モーダル */
+  .modal-overlay {
+    display: none; position: fixed; inset: 0;
+    background: rgba(0,0,0,.45); z-index: 100;
+    align-items: center; justify-content: center;
+  }
+  .modal-overlay.open { display: flex; }
+  .modal {
+    background: var(--surface); border-radius: 16px;
+    padding: 28px; width: 90%; max-width: 440px;
+    box-shadow: 0 8px 40px rgba(0,0,0,.18);
+  }
+  .modal h3 { font-size: 17px; font-weight: 700; margin-bottom: 8px; }
+  .modal p  { font-size: 13px; color: var(--text-sub); line-height: 1.6; margin-bottom: 16px; }
+  .modal-actions { display: flex; gap: 8px; justify-content: flex-end; flex-wrap: wrap; }
+
+  .gmail-subject-row { margin-bottom: 12px; }
+  .gmail-subject-row label {
+    display: block; font-size: 12px; font-weight: 600;
+    color: var(--text-sub); margin-bottom: 6px;
+  }
+  .gmail-subject-row input {
+    width: 100%; padding: 10px 12px;
+    border: 1px solid var(--border); border-radius: 8px;
+    font-size: 14px; font-family: 'Inter', sans-serif;
+    color: var(--text); background: var(--bg); outline: none;
+  }
+  .gmail-subject-row input:focus { border-color: var(--accent); background: var(--surface); }
+  .summary-box {
+    font-size: 13px; color: var(--text-sub); background: var(--surface-alt);
+    border-radius: 8px; padding: 10px 14px; margin-bottom: 16px; line-height: 1.6;
+  }
+  .summary-box strong { color: var(--text); }
+
+  /* ローディング */
+  .loading-wrap {
+    display: flex; flex-direction: column; align-items: center;
+    gap: 14px; padding: 40px 0;
+  }
+  .spinner {
+    width: 36px; height: 36px;
+    border: 3px solid var(--accent-light);
+    border-top-color: var(--accent);
+    border-radius: 50%; animation: spin .7s linear infinite;
+  }
+  @keyframes spin { to { transform: rotate(360deg); } }
+  .loading-text { font-size: 14px; color: var(--text-sub); font-weight: 500; }
+
+  /* エラー */
+  .error-box {
+    background: var(--danger-bg); border: 1px solid #FECDCA;
+    border-radius: 10px; padding: 14px 16px;
+    font-size: 13px; color: var(--danger); line-height: 1.6;
+  }
+
+  /* API キー入力 */
+  .apikey-row { display: flex; gap: 8px; align-items: flex-end; }
+  .apikey-row .option-group { flex: 1; margin-bottom: 0; }
+
+  #result-section, #loading-section, #error-section { display: none; }
+
+  @media (max-width: 520px) {
+    .options-grid { grid-template-columns: 1fr; }
+    .option-group.full { grid-column: 1; }
+    .header h1 { font-size: 22px; }
+  }
+</style>
+</head>
+<body>
+<div class="container">
+
+  <!-- ヘッダー -->
+  <div class="header">
+    <div class="eyebrow">✉ Mail Reply AI</div>
+    <h1>メールスクショから<br>返信文を自動生成</h1>
+    <p>スクリーンショットをアップロードするだけで、ビジネス返信文を3パターン作成します。</p>
+  </div>
+
+  <!-- APIキー -->
+  <div class="card">
+    <div class="card-title">🔑 Anthropic APIキー</div>
+    <div class="option-group">
+      <label>APIキー（sk-ant-...）</label>
+      <input type="password" id="api-key" placeholder="sk-ant-xxxxxxxxxxxxxxxxxx">
+    </div>
+    <p style="font-size:12px;color:var(--text-muted);margin-top:8px;">
+      キーはブラウザ外に送信されません。取得: <a href="https://console.anthropic.com" target="_blank" style="color:var(--accent)">console.anthropic.com</a>
+    </p>
+  </div>
+
+  <!-- 画像アップロード -->
+  <div class="card">
+    <div class="card-title">📎 メールのスクリーンショット</div>
+
+    <div class="drop-zone" id="drop-zone">
+      <input type="file" id="file-input" accept="image/*">
+      <div class="drop-icon">🖼️</div>
+      <div class="drop-label">クリックまたはドラッグ＆ドロップ</div>
+      <div class="drop-sub">PNG / JPG / WEBP 対応</div>
+    </div>
+
+    <div id="preview-wrap">
+      <img id="preview-img" alt="プレビュー">
+      <button class="btn btn-secondary" onclick="resetImage()">🔄 画像を変更</button>
+    </div>
+  </div>
+
+  <!-- オプション -->
+  <div class="card">
+    <div class="card-title">⚙️ 生成オプション</div>
+    <div class="options-grid">
+      <div class="option-group">
+        <label>文体</label>
+        <select id="tone">
+          <option value="formal">丁寧・ビジネス敬語</option>
+          <option value="casual">ビジネスカジュアル</option>
+          <option value="concise">簡潔・要点のみ</option>
+        </select>
+      </div>
+      <div class="option-group">
+        <label>返信言語</label>
+        <select id="lang">
+          <option value="auto">自動検出（元メールに合わせる）</option>
+          <option value="ja">日本語</option>
+          <option value="en">英語</option>
+        </select>
+      </div>
+      <div class="option-group">
+        <label>送信者名（任意）</label>
+        <input type="text" id="sender" placeholder="例：山田太郎">
+      </div>
+      <div class="option-group full">
+        <label>追加指示（任意）</label>
+        <textarea id="extra" rows="2" placeholder="例：来週の会議について承諾する方向で、日程は水曜以降を希望と伝える"></textarea>
+      </div>
+    </div>
+  </div>
+
+  <!-- 生成ボタン -->
+  <div style="margin-bottom:20px;">
+    <button class="btn btn-primary" id="generate-btn" onclick="generate()" disabled>
+      ✨ 返信文を生成する
+    </button>
+  </div>
+
+  <!-- ローディング -->
+  <div class="card" id="loading-section">
+    <div class="loading-wrap">
+      <div class="spinner"></div>
+      <div class="loading-text">メール内容を解析して返信文を作成しています…</div>
+    </div>
+  </div>
+
+  <!-- エラー -->
+  <div class="card" id="error-section">
+    <div class="error-box" id="error-msg"></div>
+  </div>
+
+  <!-- 結果 -->
+  <div class="card" id="result-section">
+    <div class="card-title">📬 生成された返信文</div>
+    <div class="summary-box" id="summary-box"></div>
+    <div class="result-tabs" id="tabs"></div>
+    <div class="reply-box" id="reply-body"></div>
+    <div class="copy-bar">
+      <span class="badge-copied"  id="copied-badge"  style="display:none">✅ コピーしました</span>
+      <span class="badge-drafted" id="drafted-badge" style="display:none">📨 下書きに追加しました</span>
+      <button class="btn btn-ghost" onclick="copyReply()">📋 コピー</button>
+      <button class="btn btn-gmail" id="gmail-btn" onclick="openGmailModal()">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" style="flex-shrink:0">
+          <path d="M20 4H4C2.9 4 2 4.9 2 6v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 4-8 5-8-5V6l8 5 8-5v2z" fill="currentColor"/>
+        </svg>
+        Gmailに下書き追加
+      </button>
+    </div>
+  </div>
+
+</div>
+
+<!-- Gmail モーダル -->
+<div class="modal-overlay" id="gmail-modal">
+  <div class="modal">
+    <h3>📨 Gmailに下書きを追加</h3>
+    <p>件名と宛先を入力してください。Gmailが開き、返信文が下書きとして入力された状態になります。</p>
+    <div class="gmail-subject-row">
+      <label>宛先メールアドレス（任意）</label>
+      <input type="email" id="gmail-to" placeholder="example@gmail.com">
+    </div>
+    <div class="gmail-subject-row">
+      <label>件名</label>
+      <input type="text" id="gmail-subject" placeholder="Re: ご連絡ありがとうございます">
+    </div>
+    <div class="modal-actions">
+      <button class="btn btn-secondary" onclick="closeGmailModal()">キャンセル</button>
+      <button class="btn btn-gmail" onclick="openGmail()">
+        Gmailで開く →
+      </button>
+    </div>
+  </div>
+</div>
+
+<script>
+  let imageBase64 = null;
+  let imageMime   = null;
+  let replies     = [];
+  let activeTab   = 0;
+
+  const dropZone   = document.getElementById('drop-zone');
+  const fileInput  = document.getElementById('file-input');
+  const previewWrap = document.getElementById('preview-wrap');
+  const previewImg  = document.getElementById('preview-img');
+  const generateBtn = document.getElementById('generate-btn');
+
+  const TONE_LABELS = {
+    formal:  '丁寧・ビジネス敬語',
+    casual:  'ビジネスカジュアル',
+    concise: '簡潔・要点のみ',
+  };
+  const LANG_LABELS = {
+    auto: '自動検出（元メールに合わせる）',
+    ja:   '日本語',
+    en:   '英語',
+  };
+
+  // ── ドラッグ＆ドロップ ──
+  dropZone.addEventListener('dragover',  e => { e.preventDefault(); dropZone.classList.add('dragging'); });
+  dropZone.addEventListener('dragleave', () => dropZone.classList.remove('dragging'));
+  dropZone.addEventListener('drop', e => {
+    e.preventDefault(); dropZone.classList.remove('dragging');
+    handleFile(e.dataTransfer.files[0]);
+  });
+  fileInput.addEventListener('change', e => handleFile(e.target.files[0]));
+
+  // ── ペースト対応 ──
+  document.addEventListener('paste', e => {
+    const item = Array.from(e.clipboardData.items).find(i => i.type.startsWith('image/'));
+    if (item) handleFile(item.getAsFile());
+  });
+
+  function handleFile(file) {
+    if (!file || !file.type.startsWith('image/')) return;
+    imageMime = file.type;
+    const reader = new FileReader();
+    reader.onload = ev => {
+      const result = ev.target.result;
+      imageBase64 = result.split(',')[1];
+      previewImg.src = result;
+      dropZone.style.display = 'none';
+      previewWrap.style.display = 'block';
+      updateBtn();
+      hideResult();
+    };
+    reader.readAsDataURL(file);
+  }
+
+  function resetImage() {
+    imageBase64 = null; imageMime = null;
+    previewWrap.style.display = 'none';
+    dropZone.style.display = 'block';
+    fileInput.value = '';
+    updateBtn(); hideResult();
+  }
+
+  function updateBtn() {
+    generateBtn.disabled = !imageBase64;
+  }
+
+  function hideResult() {
+    document.getElementById('result-section').style.display  = 'none';
+    document.getElementById('error-section').style.display   = 'none';
+    document.getElementById('loading-section').style.display = 'none';
+  }
+
+  // ── プロンプト生成 ──
+  function buildPrompt() {
+    const tone   = document.getElementById('tone').value;
+    const lang   = document.getElementById('lang').value;
+    const sender = document.getElementById('sender').value.trim();
+    const extra  = document.getElementById('extra').value.trim();
+
+    return `あなたはプロのビジネスメール作成アシスタントです。
+添付のスクリーンショット画像はメールの内容です。
+
+このメールへの返信文を以下の条件で3パターン作成してください。
+
+【条件】
+- 文体: ${TONE_LABELS[tone]}
+- 言語: ${LANG_LABELS[lang]}
+${sender ? `- 送信者名: ${sender}` : ''}
+${extra  ? `- 追加指示: ${extra}`  : ''}
+
+【出力形式】
+必ずJSON形式のみで返してください。前置きや説明文は不要です。
+{
+  "detected_lang": "ja または en",
+  "original_summary": "元メールの要約（1〜2文）",
+  "replies": [
+    {"label": "パターン1のラベル", "body": "返信文"},
+    {"label": "パターン2のラベル", "body": "返信文"},
+    {"label": "パターン3のラベル", "body": "返信文"}
+  ]
+}
+
+パターンは「承諾・快諾」「確認・保留」「丁寧な断り」など状況に応じた自然なバリエーションにしてください。`;
+  }
+
+  // ── 生成 ──
+  async function generate() {
+    const apiKey = document.getElementById('api-key').value.trim();
+    if (!apiKey) { showError('APIキーを入力してください。'); return; }
+    if (!imageBase64) return;
+
+    hideResult();
+    document.getElementById('loading-section').style.display = 'block';
+    generateBtn.disabled = true;
+
+    try {
+      const res = await fetch('https://api.anthropic.com/v1/messages', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'x-api-key': apiKey,
+          'anthropic-version': '2023-06-01',
+          'anthropic-dangerous-direct-browser-access': 'true',
+        },
+        body: JSON.stringify({
+          model: 'claude-sonnet-4-6',
+          max_tokens: 1500,
+          messages: [{
+            role: 'user',
+            content: [
+              { type: 'image', source: { type: 'base64', media_type: imageMime, data: imageBase64 } },
+              { type: 'text',  text: buildPrompt() },
+            ],
+          }],
+        }),
+      });
+
+      if (!res.ok) {
+        const err = await res.json();
+        throw new Error(err?.error?.message || `HTTP ${res.status}`);
+      }
+
+      const data = await res.json();
+      const raw  = data.content.map(b => b.text || '').join('');
+      const clean = raw.replace(/```json|```/g, '').trim();
+      const parsed = JSON.parse(clean);
+
+      showResult(parsed);
+    } catch (e) {
+      showError('生成に失敗しました: ' + e.message);
+    } finally {
+      document.getElementById('loading-section').style.display = 'none';
+      generateBtn.disabled = false;
+    }
+  }
+
+  function showResult(parsed) {
+    replies = parsed.replies || [];
+    activeTab = 0;
+
+    // 要約
+    const lang = parsed.detected_lang ? `[${parsed.detected_lang.toUpperCase()}]` : '';
+    document.getElementById('summary-box').innerHTML =
+      `<strong>📋 元メール要約 ${lang}：</strong> ${parsed.original_summary || '—'}`;
+
+    // タブ
+    const tabsEl = document.getElementById('tabs');
+    tabsEl.innerHTML = '';
+    replies.forEach((r, i) => {
+      const btn = document.createElement('button');
+      btn.className = 'tab' + (i === 0 ? ' active' : '');
+      btn.textContent = r.label;
+      btn.onclick = () => switchTab(i);
+      tabsEl.appendChild(btn);
+    });
+
+    renderReply();
+    document.getElementById('result-section').style.display = 'block';
+    document.getElementById('result-section').scrollIntoView({ behavior: 'smooth' });
+  }
+
+  function switchTab(i) {
+    activeTab = i;
+    document.querySelectorAll('.tab').forEach((t, j) => t.classList.toggle('active', i === j));
+    renderReply();
+    document.getElementById('copied-badge').style.display  = 'none';
+    document.getElementById('drafted-badge').style.display = 'none';
+  }
+
+  function renderReply() {
+    document.getElementById('reply-body').textContent = replies[activeTab]?.body || '';
+  }
+
+  function copyReply() {
+    const text = replies[activeTab]?.body || '';
+    navigator.clipboard.writeText(text).then(() => {
+      showBadge('copied-badge');
+    });
+  }
+
+  // ── Gmail 下書き ──
+  function openGmailModal() {
+    if (!replies[activeTab]) return;
+    document.getElementById('gmail-modal').classList.add('open');
+  }
+
+  function closeGmailModal() {
+    document.getElementById('gmail-modal').classList.remove('open');
+  }
+
+  function openGmail() {
+    const body    = replies[activeTab]?.body || '';
+    const to      = document.getElementById('gmail-to').value.trim();
+    const subject = document.getElementById('gmail-subject').value.trim() || 'Re: ';
+
+    // Gmail compose URL（本文・件名・宛先をURLエンコードして渡す）
+    const params = new URLSearchParams({
+      view: 'cm',
+      fs:   '1',
+      su:   subject,
+      body: body,
+    });
+    if (to) params.set('to', to);
+
+    window.open('https://mail.google.com/mail/?' + params.toString(), '_blank');
+    closeGmailModal();
+    showBadge('drafted-badge');
+  }
+
+  function showBadge(id) {
+    // 両方いったん非表示
+    document.getElementById('copied-badge').style.display  = 'none';
+    document.getElementById('drafted-badge').style.display = 'none';
+    const el = document.getElementById(id);
+    el.style.display = 'inline-flex';
+    setTimeout(() => el.style.display = 'none', 3000);
+  }
+
+  // モーダル外クリックで閉じる
+  document.getElementById('gmail-modal').addEventListener('click', function(e) {
+    if (e.target === this) closeGmailModal();
+  });
+
+  function showError(msg) {
+    document.getElementById('error-msg').textContent = '⚠️ ' + msg;
+    document.getElementById('error-section').style.display = 'block';
+  }
+</script>
+</body>
+</html>
