@@ -3,308 +3,473 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
-<title>ハートフルレター作成</title>
+<title>ハートフルレター</title>
 <style>
   * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+
   body {
     font-family: -apple-system, BlinkMacSystemFont, "Helvetica Neue", sans-serif;
-    background: #f5f0eb;
+    background: #f7f3ee;
     min-height: 100vh;
-    padding: 16px;
-    color: #2c2c2c;
+    color: #2c2118;
+    padding: 16px 16px 40px;
   }
+
+  header {
+    text-align: center;
+    padding: 28px 0 24px;
+  }
+  .logo { font-size: 28px; margin-bottom: 4px; }
   h1 {
-    text-align: center;
-    font-size: 20px;
-    font-weight: 600;
-    color: #5a3e2b;
-    margin-bottom: 4px;
-    letter-spacing: 0.05em;
+    font-size: 22px;
+    font-weight: 700;
+    color: #3d2b1a;
+    letter-spacing: 0.08em;
   }
-  .subtitle {
-    text-align: center;
-    font-size: 12px;
-    color: #999;
-    margin-bottom: 20px;
-  }
+  .subtitle { font-size: 12px; color: #a08060; margin-top: 4px; letter-spacing: 0.05em; }
+
+  /* ─── カード ─── */
   .card {
     background: #fff;
-    border-radius: 16px;
-    padding: 20px;
-    margin-bottom: 16px;
-    box-shadow: 0 2px 12px rgba(0,0,0,0.07);
+    border-radius: 18px;
+    padding: 18px;
+    margin-bottom: 14px;
+    box-shadow: 0 2px 16px rgba(90,60,30,0.07);
   }
-  .section-title {
+  .card-title {
+    font-size: 12px;
+    font-weight: 700;
+    color: #a08060;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    margin-bottom: 14px;
+    padding-bottom: 8px;
+    border-bottom: 1px solid #f0e8de;
+  }
+
+  /* ─── APIキー ─── */
+  .api-row { display: flex; gap: 8px; align-items: center; }
+  .api-input {
+    flex: 1;
+    border: 1.5px solid #e8ddd0;
+    border-radius: 10px;
+    padding: 10px 12px;
+    font-size: 14px;
+    font-family: monospace;
+    background: #faf7f3;
+    color: #2c2118;
+    outline: none;
+  }
+  .api-input:focus { border-color: #8b5e3c; }
+  .btn-small {
+    background: #3d2b1a;
+    color: #f7f3ee;
+    border: none;
+    border-radius: 10px;
+    padding: 10px 14px;
     font-size: 13px;
     font-weight: 600;
-    color: #5a3e2b;
-    margin-bottom: 12px;
-    padding-bottom: 6px;
-    border-bottom: 1px solid #f0e8e0;
+    cursor: pointer;
+    white-space: nowrap;
   }
+  .api-status { font-size: 12px; margin-top: 6px; min-height: 16px; }
+  .api-ok { color: #5a8a5a; }
+  .api-ng { color: #c0392b; }
+
+  /* ─── フォーム ─── */
   .field { margin-bottom: 12px; }
+  .field:last-child { margin-bottom: 0; }
   label {
     display: block;
     font-size: 12px;
-    color: #888;
+    color: #a08060;
     margin-bottom: 4px;
+    font-weight: 600;
+    letter-spacing: 0.04em;
   }
-  .required { color: #c0392b; }
-  input, textarea, select {
+  .req { color: #c0392b; }
+  input[type=text], textarea {
     width: 100%;
-    border: 1.5px solid #e8e0d8;
+    border: 1.5px solid #e8ddd0;
     border-radius: 10px;
-    padding: 10px 12px;
+    padding: 11px 13px;
     font-size: 15px;
     font-family: inherit;
-    background: #fdfaf7;
-    color: #2c2c2c;
+    background: #faf7f3;
+    color: #2c2118;
     outline: none;
     transition: border-color 0.2s;
   }
-  input:focus, textarea:focus, select:focus { border-color: #5a3e2b; }
-  textarea { resize: vertical; min-height: 70px; }
+  input[type=text]:focus, textarea:focus { border-color: #8b5e3c; }
+  textarea { resize: vertical; min-height: 64px; }
+
+  .field-row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+
+  /* ─── 生成ボタン ─── */
   .btn-generate {
     width: 100%;
-    background: #5a3e2b;
-    color: #fff;
+    background: #3d2b1a;
+    color: #f7f3ee;
     border: none;
     border-radius: 14px;
-    padding: 16px;
+    padding: 17px;
     font-size: 17px;
-    font-weight: 600;
+    font-weight: 700;
     cursor: pointer;
-    letter-spacing: 0.05em;
-    transition: opacity 0.2s;
+    letter-spacing: 0.06em;
+    transition: opacity 0.2s, transform 0.1s;
+    margin-top: 4px;
   }
-  .btn-generate:active { opacity: 0.8; }
-  .btn-generate:disabled { opacity: 0.5; }
+  .btn-generate:active { opacity: 0.85; transform: scale(0.99); }
+  .btn-generate:disabled { opacity: 0.4; }
+
+  /* ─── ローディング ─── */
+  .loading {
+    text-align: center;
+    padding: 40px 0;
+    display: none;
+  }
+  .spinner {
+    width: 34px; height: 34px;
+    border: 3px solid #e8ddd0;
+    border-top-color: #8b5e3c;
+    border-radius: 50%;
+    animation: spin 0.8s linear infinite;
+    margin: 0 auto 12px;
+  }
+  @keyframes spin { to { transform: rotate(360deg); } }
+  .loading-text { color: #a08060; font-size: 14px; }
+
+  /* ─── 結果 ─── */
   .result-card {
     background: #fff;
-    border-radius: 16px;
-    padding: 20px;
-    margin-top: 16px;
-    box-shadow: 0 2px 12px rgba(0,0,0,0.07);
+    border-radius: 18px;
+    padding: 18px;
+    margin-top: 14px;
+    box-shadow: 0 2px 16px rgba(90,60,30,0.07);
     display: none;
   }
   .result-header {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    margin-bottom: 12px;
+    margin-bottom: 14px;
+    padding-bottom: 10px;
+    border-bottom: 1px solid #f0e8de;
   }
-  .result-title {
-    font-size: 13px;
-    font-weight: 600;
-    color: #5a3e2b;
-  }
-  .btn-copy {
-    background: #f0e8e0;
-    color: #5a3e2b;
-    border: none;
+  .result-label { font-size: 12px; font-weight: 700; color: #a08060; letter-spacing: 0.1em; }
+  .btn-action-row { display: flex; gap: 8px; }
+  .btn-action {
+    border: 1.5px solid #e8ddd0;
+    background: #faf7f3;
+    color: #3d2b1a;
     border-radius: 8px;
     padding: 6px 14px;
     font-size: 13px;
     font-weight: 600;
     cursor: pointer;
+    transition: all 0.15s;
   }
-  .letter-output {
+  .btn-action.done { border-color: #5a8a5a; color: #5a8a5a; }
+
+  .letter-box {
     white-space: pre-wrap;
     font-size: 14px;
-    line-height: 1.8;
-    color: #2c2c2c;
-    background: #fdfaf7;
-    border-radius: 10px;
-    padding: 16px;
-    border: 1px solid #f0e8e0;
-    min-height: 200px;
+    line-height: 2.0;
+    color: #2c2118;
+    background: #faf7f3;
+    border-radius: 12px;
+    padding: 18px;
+    border: 1px solid #f0e8de;
   }
-  .loading {
-    text-align: center;
-    color: #999;
+
+  /* ─── エラー ─── */
+  .error-box {
+    background: #fff0f0;
+    border: 1.5px solid #f5c0c0;
+    border-radius: 12px;
+    padding: 14px;
+    color: #c0392b;
     font-size: 14px;
-    padding: 40px 0;
+    margin-top: 14px;
     display: none;
+    line-height: 1.6;
   }
-  .spinner {
-    width: 32px; height: 32px;
-    border: 3px solid #f0e8e0;
-    border-top-color: #5a3e2b;
-    border-radius: 50%;
-    animation: spin 0.8s linear infinite;
-    margin: 0 auto 12px;
+
+  /* ─── 担当者記憶 ─── */
+  .remember-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-top: 10px;
+    font-size: 13px;
+    color: #a08060;
   }
-  @keyframes spin { to { transform: rotate(360deg); } }
-  .copied { background: #5a3e2b !important; color: #fff !important; }
+  .remember-row input[type=checkbox] { width: 16px; height: 16px; accent-color: #8b5e3c; }
 </style>
 </head>
 <body>
 
-<h1>💌 ハートフルレター</h1>
-<p class="subtitle">TOD'S 来店御礼レター自動作成</p>
+<header>
+  <div class="logo">💌</div>
+  <h1>HEARTFUL LETTER</h1>
+  <p class="subtitle">TOD'S 来店御礼レター自動作成</p>
+</header>
 
+<!-- APIキー -->
 <div class="card">
-  <div class="section-title">お客様情報</div>
-  <div class="field">
-    <label>お客様氏名（姓）<span class="required">*</span></label>
-    <input type="text" id="lastName" placeholder="例：山田">
+  <div class="card-title">🔑 API設定</div>
+  <div class="api-row">
+    <input type="password" class="api-input" id="apiKey" placeholder="sk-ant-api03-...">
+    <button class="btn-small" onclick="saveKey()">保存</button>
+  </div>
+  <div class="api-status" id="apiStatus"></div>
+</div>
+
+<!-- お客様情報 -->
+<div class="card">
+  <div class="card-title">👤 お客様情報</div>
+  <div class="field-row">
+    <div class="field">
+      <label>姓 <span class="req">*</span></label>
+      <input type="text" id="lastName" placeholder="山田">
+    </div>
+    <div class="field">
+      <label>名 <span class="req">*</span></label>
+      <input type="text" id="firstName" placeholder="花子">
+    </div>
   </div>
   <div class="field">
-    <label>お客様氏名（名）<span class="required">*</span></label>
-    <input type="text" id="firstName" placeholder="例：花子">
-  </div>
-  <div class="field">
-    <label>来店シチュエーション<span class="required">*</span></label>
+    <label>来店シチュエーション <span class="req">*</span></label>
     <input type="text" id="situation" placeholder="例：お誕生日のお祝い、旅行のついでに">
   </div>
   <div class="field">
-    <label>お客様の印象・雰囲気（任意）</label>
-    <input type="text" id="impression" placeholder="例：エレガントな雰囲気、明るく笑顔が素敵">
+    <label>お客様の印象・雰囲気</label>
+    <input type="text" id="impression" placeholder="例：エレガントな雰囲気、笑顔が素敵">
   </div>
   <div class="field">
-    <label>同伴者情報（任意）</label>
+    <label>同伴者情報</label>
     <input type="text" id="companion" placeholder="例：浜松からお二人で、ご家族で">
   </div>
 </div>
 
+<!-- 商品・担当 -->
 <div class="card">
-  <div class="section-title">購入商品・担当情報</div>
+  <div class="card-title">🛍 商品・担当者情報</div>
   <div class="field">
-    <label>購入商品名<span class="required">*</span></label>
+    <label>購入商品名 <span class="req">*</span></label>
     <input type="text" id="product" placeholder="例：タイムレスローファー">
   </div>
   <div class="field">
-    <label>担当スタッフ名<span class="required">*</span></label>
-    <input type="text" id="staff" placeholder="例：石川">
+    <label>担当スタッフ名 <span class="req">*</span></label>
+    <input type="text" id="staff" placeholder="例：石川" id="staff">
   </div>
-  <div class="field">
-    <label>店舗名<span class="required">*</span></label>
-    <input type="text" id="store" placeholder="例：TOD'S 御殿場プレミアムアウトレット店" value="TOD'S 御殿場プレミアムアウトレット店">
+  <div class="remember-row">
+    <input type="checkbox" id="rememberStaff">
+    <label for="rememberStaff" style="color:#a08060;font-size:13px;margin:0;">担当者名を記憶する</label>
+  </div>
+  <div class="field" style="margin-top:12px;">
+    <label>店舗名 <span class="req">*</span></label>
+    <input type="text" id="store" placeholder="TOD'S 御殿場プレミアムアウトレット店">
+  </div>
+  <div class="remember-row">
+    <input type="checkbox" id="rememberStore">
+    <label for="rememberStore" style="color:#a08060;font-size:13px;margin:0;">店舗名を記憶する</label>
   </div>
 </div>
 
-<button class="btn-generate" onclick="generateLetter()">✨ レターを作成する</button>
+<button class="btn-generate" onclick="generate()">✨ レターを作成する</button>
 
 <div class="loading" id="loading">
   <div class="spinner"></div>
-  レターを作成中...
+  <div class="loading-text">心を込めてレターを作成中...</div>
 </div>
+
+<div class="error-box" id="errorBox"></div>
 
 <div class="result-card" id="resultCard">
   <div class="result-header">
-    <div class="result-title">📝 完成したレター</div>
-    <button class="btn-copy" id="copyBtn" onclick="copyLetter()">コピー</button>
+    <div class="result-label">📝 完成したレター</div>
+    <div class="btn-action-row">
+      <button class="btn-action" id="copyBtn" onclick="copyLetter()">コピー</button>
+      <button class="btn-action" onclick="reset()">クリア</button>
+    </div>
   </div>
-  <div class="letter-output" id="letterOutput"></div>
+  <div class="letter-box" id="letterBox"></div>
 </div>
 
 <script>
-async function generateLetter() {
-  const lastName = document.getElementById('lastName').value.trim();
-  const firstName = document.getElementById('firstName').value.trim();
-  const situation = document.getElementById('situation').value.trim();
-  const product = document.getElementById('product').value.trim();
-  const staff = document.getElementById('staff').value.trim();
-  const store = document.getElementById('store').value.trim();
-  const impression = document.getElementById('impression').value.trim();
-  const companion = document.getElementById('companion').value.trim();
+  // ── 初期化：保存済みデータを読み込む ──
+  window.addEventListener('DOMContentLoaded', () => {
+    const key = sessionStorage.getItem('anthropic_key');
+    if (key) {
+      document.getElementById('apiKey').value = key;
+      document.getElementById('apiStatus').innerHTML = '<span class="api-ok">✓ APIキー設定済み</span>';
+    }
+    const staff = localStorage.getItem('staff_name');
+    if (staff) {
+      document.getElementById('staff').value = staff;
+      document.getElementById('rememberStaff').checked = true;
+    }
+    const store = localStorage.getItem('store_name');
+    if (store) {
+      document.getElementById('store').value = store;
+      document.getElementById('rememberStore').checked = true;
+    }
+  });
 
-  if (!lastName || !firstName || !situation || !product || !staff || !store) {
-    alert('＊マークの項目をすべて入力してください');
-    return;
+  function saveKey() {
+    const key = document.getElementById('apiKey').value.trim();
+    const status = document.getElementById('apiStatus');
+    if (!key.startsWith('sk-ant-')) {
+      status.innerHTML = '<span class="api-ng">⚠ sk-ant- で始まるキーを入力してください</span>';
+      return;
+    }
+    sessionStorage.setItem('anthropic_key', key);
+    status.innerHTML = '<span class="api-ok">✓ 保存しました</span>';
   }
 
-  document.getElementById('loading').style.display = 'block';
-  document.getElementById('resultCard').style.display = 'none';
-  document.querySelector('.btn-generate').disabled = true;
+  async function generate() {
+    const apiKey = document.getElementById('apiKey').value.trim();
+    const lastName = document.getElementById('lastName').value.trim();
+    const firstName = document.getElementById('firstName').value.trim();
+    const situation = document.getElementById('situation').value.trim();
+    const product = document.getElementById('product').value.trim();
+    const staff = document.getElementById('staff').value.trim();
+    const store = document.getElementById('store').value.trim();
+    const impression = document.getElementById('impression').value.trim();
+    const companion = document.getElementById('companion').value.trim();
 
-  const prompt = `あなたはTOD'Sの高級ブランド店スタッフです。以下の情報をもとに、来店後にお客様へ送るハートフルレター（アフターフォローメール）を作成してください。
+    // バリデーション
+    if (!apiKey || !apiKey.startsWith('sk-ant-')) {
+      showError('APIキーを入力・保存してください。');
+      return;
+    }
+    if (!lastName || !firstName || !situation || !product || !staff || !store) {
+      showError('＊マークの項目をすべて入力してください。');
+      return;
+    }
+
+    // 担当者・店舗名の記憶
+    if (document.getElementById('rememberStaff').checked) {
+      localStorage.setItem('staff_name', staff);
+    }
+    if (document.getElementById('rememberStore').checked) {
+      localStorage.setItem('store_name', store);
+    }
+
+    // UI
+    document.getElementById('loading').style.display = 'block';
+    document.getElementById('resultCard').style.display = 'none';
+    document.getElementById('errorBox').style.display = 'none';
+    document.querySelector('.btn-generate').disabled = true;
+
+    const prompt = `あなたはTOD'Sのラグジュアリーブランド店スタッフです。
+以下の情報をもとに、来店後にお客様へ送るハートフルレター（アフターフォローメール）を作成してください。
 
 【お客様情報】
-- お客様氏名：${lastName} ${firstName}様（姓名の間は全角スペース1つ）
-- 来店シチュエーション：${situation}
-- お客様の印象：${impression || '記載なし'}
-- 同伴者情報：${companion || '記載なし'}
+氏名：${lastName}　${firstName}様（宛名は姓と名の間に全角スペース1つ）
+来店シチュエーション：${situation}
+お客様の印象：${impression || 'なし'}
+同伴者情報：${companion || 'なし'}
 
 【商品・担当情報】
-- 購入商品：${product}
-- 担当スタッフ：${staff}
-- 店舗名：${store}
+購入商品：${product}
+担当スタッフ：${staff}
+店舗名：${store}
 
-【フォーマット（必ず守ること）】
+【厳守するフォーマット】
 件名：ご来店ありがとうございました。（${store}）
-
 （空行2行）
-
 ${lastName}　${firstName}様
-
 （空行）
-
 来店御礼文（1〜2文）
-
 （空行）
-
-購入商品へのパーソナルコメント（商品名を明記し印象と結びつける）
-来店シチュエーション・エピソード（具体的な記憶を言語化）
-長期愛用の願い（1文）
-
+・購入商品へのパーソナルコメント（商品名を明記しお客様の印象と結びつける1文）
+・来店シチュエーション・エピソードの言語化（1〜2文）
+・長期愛用の願い（1文）
 （空行）
-
-「私、${staff}までお気軽にお問い合わせください。」
-
+「ご不明な点や気になる点がございましたら、私、${staff}までお気軽にお問い合わせください。」
 （空行）
-
 「また、${lastName}様にお会いできることを心よりお待ち申し上げております。」
-
 （空行2行）
-
 ${store}
 
 【文体ルール】
-- 丁寧語＋謙譲語を自然に混在
-- 事務的・テンプレート的にならない
-- 固有名詞（商品名・シチュエーション）を必ず盛り込む
-- 温かみのある文章
-- 姓名の間は全角スペース1つ
+・丁寧語＋謙譲語を自然に混在、過剰な敬語は避ける
+・事務的・テンプレート的にならない
+・固有名詞（商品名・地名・シチュエーション）を必ず盛り込む
+・温かみのある文章
 
-レターのみを出力してください。説明文は不要です。`;
+レター本文のみを出力してください。説明文・前置き・コメントは一切不要です。`;
 
-  try {
-    const response = await fetch('https://api.anthropic.com/v1/messages', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        model: 'claude-sonnet-4-6',
-        max_tokens: 1000,
-        messages: [{ role: 'user', content: prompt }]
-      })
-    });
+    try {
+      const res = await fetch('https://api.anthropic.com/v1/messages', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'x-api-key': apiKey,
+          'anthropic-version': '2023-06-01',
+          'anthropic-dangerous-direct-browser-access': 'true'
+        },
+        body: JSON.stringify({
+          model: 'claude-sonnet-4-6',
+          max_tokens: 1000,
+          messages: [{ role: 'user', content: prompt }]
+        })
+      });
 
-    const data = await response.json();
-    const letter = data.content[0].text;
+      if (!res.ok) {
+        const err = await res.json();
+        throw new Error(err.error?.message || `APIエラー (${res.status})`);
+      }
 
-    document.getElementById('letterOutput').textContent = letter;
-    document.getElementById('resultCard').style.display = 'block';
-  } catch (e) {
-    alert('エラーが発生しました。ネットワーク接続を確認してください。');
+      const data = await res.json();
+      const letter = data.content[0].text;
+
+      document.getElementById('letterBox').textContent = letter;
+      document.getElementById('resultCard').style.display = 'block';
+      document.getElementById('resultCard').scrollIntoView({ behavior: 'smooth' });
+
+    } catch (e) {
+      showError(e.message || 'エラーが発生しました。APIキーとネット接続を確認してください。');
+    }
+
+    document.getElementById('loading').style.display = 'none';
+    document.querySelector('.btn-generate').disabled = false;
   }
 
-  document.getElementById('loading').style.display = 'none';
-  document.querySelector('.btn-generate').disabled = false;
-}
+  function showError(msg) {
+    const box = document.getElementById('errorBox');
+    box.textContent = '⚠️ ' + msg;
+    box.style.display = 'block';
+    document.getElementById('loading').style.display = 'none';
+    document.querySelector('.btn-generate').disabled = false;
+  }
 
-function copyLetter() {
-  const text = document.getElementById('letterOutput').textContent;
-  navigator.clipboard.writeText(text).then(() => {
-    const btn = document.getElementById('copyBtn');
-    btn.textContent = 'コピーしました✓';
-    btn.classList.add('copied');
-    setTimeout(() => {
-      btn.textContent = 'コピー';
-      btn.classList.remove('copied');
-    }, 2000);
-  });
-}
+  function copyLetter() {
+    const text = document.getElementById('letterBox').textContent;
+    navigator.clipboard.writeText(text).then(() => {
+      const btn = document.getElementById('copyBtn');
+      btn.textContent = 'コピー済み✓';
+      btn.classList.add('done');
+      setTimeout(() => {
+        btn.textContent = 'コピー';
+        btn.classList.remove('done');
+      }, 2500);
+    });
+  }
+
+  function reset() {
+    document.getElementById('resultCard').style.display = 'none';
+    document.getElementById('lastName').value = '';
+    document.getElementById('firstName').value = '';
+    document.getElementById('situation').value = '';
+    document.getElementById('impression').value = '';
+    document.getElementById('companion').value = '';
+    document.getElementById('product').value = '';
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
 </script>
 </body>
 </html>
