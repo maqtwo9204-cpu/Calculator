@@ -1,0 +1,310 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>ハートフルレター作成</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "Helvetica Neue", sans-serif;
+    background: #f5f0eb;
+    min-height: 100vh;
+    padding: 16px;
+    color: #2c2c2c;
+  }
+  h1 {
+    text-align: center;
+    font-size: 20px;
+    font-weight: 600;
+    color: #5a3e2b;
+    margin-bottom: 4px;
+    letter-spacing: 0.05em;
+  }
+  .subtitle {
+    text-align: center;
+    font-size: 12px;
+    color: #999;
+    margin-bottom: 20px;
+  }
+  .card {
+    background: #fff;
+    border-radius: 16px;
+    padding: 20px;
+    margin-bottom: 16px;
+    box-shadow: 0 2px 12px rgba(0,0,0,0.07);
+  }
+  .section-title {
+    font-size: 13px;
+    font-weight: 600;
+    color: #5a3e2b;
+    margin-bottom: 12px;
+    padding-bottom: 6px;
+    border-bottom: 1px solid #f0e8e0;
+  }
+  .field { margin-bottom: 12px; }
+  label {
+    display: block;
+    font-size: 12px;
+    color: #888;
+    margin-bottom: 4px;
+  }
+  .required { color: #c0392b; }
+  input, textarea, select {
+    width: 100%;
+    border: 1.5px solid #e8e0d8;
+    border-radius: 10px;
+    padding: 10px 12px;
+    font-size: 15px;
+    font-family: inherit;
+    background: #fdfaf7;
+    color: #2c2c2c;
+    outline: none;
+    transition: border-color 0.2s;
+  }
+  input:focus, textarea:focus, select:focus { border-color: #5a3e2b; }
+  textarea { resize: vertical; min-height: 70px; }
+  .btn-generate {
+    width: 100%;
+    background: #5a3e2b;
+    color: #fff;
+    border: none;
+    border-radius: 14px;
+    padding: 16px;
+    font-size: 17px;
+    font-weight: 600;
+    cursor: pointer;
+    letter-spacing: 0.05em;
+    transition: opacity 0.2s;
+  }
+  .btn-generate:active { opacity: 0.8; }
+  .btn-generate:disabled { opacity: 0.5; }
+  .result-card {
+    background: #fff;
+    border-radius: 16px;
+    padding: 20px;
+    margin-top: 16px;
+    box-shadow: 0 2px 12px rgba(0,0,0,0.07);
+    display: none;
+  }
+  .result-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 12px;
+  }
+  .result-title {
+    font-size: 13px;
+    font-weight: 600;
+    color: #5a3e2b;
+  }
+  .btn-copy {
+    background: #f0e8e0;
+    color: #5a3e2b;
+    border: none;
+    border-radius: 8px;
+    padding: 6px 14px;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+  }
+  .letter-output {
+    white-space: pre-wrap;
+    font-size: 14px;
+    line-height: 1.8;
+    color: #2c2c2c;
+    background: #fdfaf7;
+    border-radius: 10px;
+    padding: 16px;
+    border: 1px solid #f0e8e0;
+    min-height: 200px;
+  }
+  .loading {
+    text-align: center;
+    color: #999;
+    font-size: 14px;
+    padding: 40px 0;
+    display: none;
+  }
+  .spinner {
+    width: 32px; height: 32px;
+    border: 3px solid #f0e8e0;
+    border-top-color: #5a3e2b;
+    border-radius: 50%;
+    animation: spin 0.8s linear infinite;
+    margin: 0 auto 12px;
+  }
+  @keyframes spin { to { transform: rotate(360deg); } }
+  .copied { background: #5a3e2b !important; color: #fff !important; }
+</style>
+</head>
+<body>
+
+<h1>💌 ハートフルレター</h1>
+<p class="subtitle">TOD'S 来店御礼レター自動作成</p>
+
+<div class="card">
+  <div class="section-title">お客様情報</div>
+  <div class="field">
+    <label>お客様氏名（姓）<span class="required">*</span></label>
+    <input type="text" id="lastName" placeholder="例：山田">
+  </div>
+  <div class="field">
+    <label>お客様氏名（名）<span class="required">*</span></label>
+    <input type="text" id="firstName" placeholder="例：花子">
+  </div>
+  <div class="field">
+    <label>来店シチュエーション<span class="required">*</span></label>
+    <input type="text" id="situation" placeholder="例：お誕生日のお祝い、旅行のついでに">
+  </div>
+  <div class="field">
+    <label>お客様の印象・雰囲気（任意）</label>
+    <input type="text" id="impression" placeholder="例：エレガントな雰囲気、明るく笑顔が素敵">
+  </div>
+  <div class="field">
+    <label>同伴者情報（任意）</label>
+    <input type="text" id="companion" placeholder="例：浜松からお二人で、ご家族で">
+  </div>
+</div>
+
+<div class="card">
+  <div class="section-title">購入商品・担当情報</div>
+  <div class="field">
+    <label>購入商品名<span class="required">*</span></label>
+    <input type="text" id="product" placeholder="例：タイムレスローファー">
+  </div>
+  <div class="field">
+    <label>担当スタッフ名<span class="required">*</span></label>
+    <input type="text" id="staff" placeholder="例：石川">
+  </div>
+  <div class="field">
+    <label>店舗名<span class="required">*</span></label>
+    <input type="text" id="store" placeholder="例：TOD'S 御殿場プレミアムアウトレット店" value="TOD'S 御殿場プレミアムアウトレット店">
+  </div>
+</div>
+
+<button class="btn-generate" onclick="generateLetter()">✨ レターを作成する</button>
+
+<div class="loading" id="loading">
+  <div class="spinner"></div>
+  レターを作成中...
+</div>
+
+<div class="result-card" id="resultCard">
+  <div class="result-header">
+    <div class="result-title">📝 完成したレター</div>
+    <button class="btn-copy" id="copyBtn" onclick="copyLetter()">コピー</button>
+  </div>
+  <div class="letter-output" id="letterOutput"></div>
+</div>
+
+<script>
+async function generateLetter() {
+  const lastName = document.getElementById('lastName').value.trim();
+  const firstName = document.getElementById('firstName').value.trim();
+  const situation = document.getElementById('situation').value.trim();
+  const product = document.getElementById('product').value.trim();
+  const staff = document.getElementById('staff').value.trim();
+  const store = document.getElementById('store').value.trim();
+  const impression = document.getElementById('impression').value.trim();
+  const companion = document.getElementById('companion').value.trim();
+
+  if (!lastName || !firstName || !situation || !product || !staff || !store) {
+    alert('＊マークの項目をすべて入力してください');
+    return;
+  }
+
+  document.getElementById('loading').style.display = 'block';
+  document.getElementById('resultCard').style.display = 'none';
+  document.querySelector('.btn-generate').disabled = true;
+
+  const prompt = `あなたはTOD'Sの高級ブランド店スタッフです。以下の情報をもとに、来店後にお客様へ送るハートフルレター（アフターフォローメール）を作成してください。
+
+【お客様情報】
+- お客様氏名：${lastName} ${firstName}様（姓名の間は全角スペース1つ）
+- 来店シチュエーション：${situation}
+- お客様の印象：${impression || '記載なし'}
+- 同伴者情報：${companion || '記載なし'}
+
+【商品・担当情報】
+- 購入商品：${product}
+- 担当スタッフ：${staff}
+- 店舗名：${store}
+
+【フォーマット（必ず守ること）】
+件名：ご来店ありがとうございました。（${store}）
+
+（空行2行）
+
+${lastName}　${firstName}様
+
+（空行）
+
+来店御礼文（1〜2文）
+
+（空行）
+
+購入商品へのパーソナルコメント（商品名を明記し印象と結びつける）
+来店シチュエーション・エピソード（具体的な記憶を言語化）
+長期愛用の願い（1文）
+
+（空行）
+
+「私、${staff}までお気軽にお問い合わせください。」
+
+（空行）
+
+「また、${lastName}様にお会いできることを心よりお待ち申し上げております。」
+
+（空行2行）
+
+${store}
+
+【文体ルール】
+- 丁寧語＋謙譲語を自然に混在
+- 事務的・テンプレート的にならない
+- 固有名詞（商品名・シチュエーション）を必ず盛り込む
+- 温かみのある文章
+- 姓名の間は全角スペース1つ
+
+レターのみを出力してください。説明文は不要です。`;
+
+  try {
+    const response = await fetch('https://api.anthropic.com/v1/messages', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        model: 'claude-sonnet-4-6',
+        max_tokens: 1000,
+        messages: [{ role: 'user', content: prompt }]
+      })
+    });
+
+    const data = await response.json();
+    const letter = data.content[0].text;
+
+    document.getElementById('letterOutput').textContent = letter;
+    document.getElementById('resultCard').style.display = 'block';
+  } catch (e) {
+    alert('エラーが発生しました。ネットワーク接続を確認してください。');
+  }
+
+  document.getElementById('loading').style.display = 'none';
+  document.querySelector('.btn-generate').disabled = false;
+}
+
+function copyLetter() {
+  const text = document.getElementById('letterOutput').textContent;
+  navigator.clipboard.writeText(text).then(() => {
+    const btn = document.getElementById('copyBtn');
+    btn.textContent = 'コピーしました✓';
+    btn.classList.add('copied');
+    setTimeout(() => {
+      btn.textContent = 'コピー';
+      btn.classList.remove('copied');
+    }, 2000);
+  });
+}
+</script>
+</body>
+</html>
