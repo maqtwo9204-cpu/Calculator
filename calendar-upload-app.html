@@ -295,6 +295,7 @@ const DOW = ["日","月","火","水","木","金","土"];
 
 let currentMode = null;
 let imageBase64 = null;
+let imageMimeType = 'image/jpeg';
 let parsedData = null; // 解析結果（編集前の元データ）
 
 /* ─── モード選択 ─── */
@@ -325,7 +326,11 @@ function handleFile(e) {
 
   const reader = new FileReader();
   reader.onload = ev => {
-    imageBase64 = ev.target.result.split(',')[1];
+    const dataUrl = ev.target.result;
+    imageBase64 = dataUrl.split(',')[1];
+    // MIMEタイプをファイルから正確に取得
+    const mime = dataUrl.match(/data:([^;]+);/);
+    imageMimeType = mime ? mime[1] : (file.type || 'image/jpeg');
     const img = document.getElementById('preview-img');
     img.src = ev.target.result;
     img.style.display = 'block';
@@ -373,7 +378,7 @@ JSON形式：{"events":[{"title":"予定のタイトル","date":"YYYY-MM-DD","st
         messages: [{
           role: "user",
           content: [
-            { type: "image", source: { type: "base64", media_type: "image/jpeg", data: imageBase64 } },
+            { type: "image", source: { type: "base64", media_type: imageMimeType, data: imageBase64 } },
             { type: "text", text: currentMode === 'shift' ? "このシフト表から石川のシフトを読み取ってください。" : "この画像から予定を読み取ってください。" }
           ]
         }]
