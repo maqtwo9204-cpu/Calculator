@@ -265,12 +265,21 @@
   <!-- APIキー -->
   <div class="card">
     <div class="card-title">🔑 Anthropic APIキー</div>
-    <div class="option-group">
+    <div class="option-group" style="margin-bottom:10px;">
       <label>APIキー（sk-ant-...）</label>
-      <input type="password" id="api-key" placeholder="sk-ant-xxxxxxxxxxxxxxxxxx">
+      <div style="display:flex;gap:8px;align-items:center;">
+        <input type="password" id="api-key" placeholder="sk-ant-xxxxxxxxxxxxxxxxxx" style="flex:1;">
+        <button class="btn btn-secondary" onclick="toggleApiKeyVisibility()" id="toggle-btn" title="表示/非表示" style="padding:10px 12px;flex-shrink:0;">👁</button>
+      </div>
     </div>
-    <p style="font-size:12px;color:var(--text-muted);margin-top:8px;">
-      キーはブラウザ外に送信されません。取得: <a href="https://console.anthropic.com" target="_blank" style="color:var(--accent)">console.anthropic.com</a>
+    <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:8px;">
+      <button class="btn btn-secondary" onclick="saveApiKey()" style="font-size:12px;padding:7px 14px;">💾 保存</button>
+      <button class="btn btn-secondary" onclick="clearApiKey()" style="font-size:12px;padding:7px 14px;color:var(--danger);">🗑 削除</button>
+      <span id="save-badge" style="display:none;font-size:12px;font-weight:600;color:var(--success);background:var(--success-bg);padding:7px 12px;border-radius:8px;">✅ 保存しました</span>
+      <span id="clear-badge" style="display:none;font-size:12px;font-weight:600;color:var(--danger);background:var(--danger-bg);padding:7px 12px;border-radius:8px;">🗑 削除しました</span>
+    </div>
+    <p style="font-size:12px;color:var(--text-muted);">
+      キーはこのデバイスのみに保存されます。取得: <a href="https://console.anthropic.com" target="_blank" style="color:var(--accent)">console.anthropic.com</a>
     </p>
   </div>
 
@@ -390,6 +399,51 @@
   let imageMime   = null;
   let replies     = [];
   let activeTab   = 0;
+
+  // ── APIキー 保存・読み込み ──
+  const API_KEY_STORAGE = 'mail_reply_api_key';
+
+  function loadApiKey() {
+    try {
+      const saved = localStorage.getItem(API_KEY_STORAGE);
+      if (saved) document.getElementById('api-key').value = saved;
+    } catch(e) {}
+  }
+
+  function saveApiKey() {
+    try {
+      const key = document.getElementById('api-key').value.trim();
+      if (!key) return;
+      localStorage.setItem(API_KEY_STORAGE, key);
+      showBadgeSub('save-badge');
+    } catch(e) {}
+  }
+
+  function clearApiKey() {
+    try {
+      localStorage.removeItem(API_KEY_STORAGE);
+      document.getElementById('api-key').value = '';
+      showBadgeSub('clear-badge');
+    } catch(e) {}
+  }
+
+  function toggleApiKeyVisibility() {
+    const input = document.getElementById('api-key');
+    input.type = input.type === 'password' ? 'text' : 'password';
+  }
+
+  function showBadgeSub(id) {
+    ['save-badge','clear-badge'].forEach(b => {
+      const el = document.getElementById(b);
+      if (el) el.style.display = 'none';
+    });
+    const el = document.getElementById(id);
+    if (!el) return;
+    el.style.display = 'inline-flex';
+    setTimeout(() => el.style.display = 'none', 2500);
+  }
+
+  window.addEventListener('DOMContentLoaded', loadApiKey);
 
   const dropZone   = document.getElementById('drop-zone');
   const fileInput  = document.getElementById('file-input');
