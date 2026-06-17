@@ -29,8 +29,10 @@
     .hint-recent { color: #5a8a5a; }
     .hint-past { color: #a8743a; }
     .api-box { background: #faf8f4; border: 1px solid #ece6dc; border-radius: 2px; padding: 14px; margin-bottom: 18px; }
-    .api-box .api-title { font-size: 11px; color: #8a8175; margin-bottom: 8px; font-family: 'Hiragino Kaku Gothic ProN', sans-serif; }
+    .api-box .api-title { font-size: 11px; color: #8a8175; margin-bottom: 8px; font-family: 'Hiragino Kaku Gothic ProN', sans-serif; display:flex; justify-content:space-between; align-items:center; }
     .api-box .api-note { font-size: 10px; color: #b3a892; margin-top: 6px; line-height: 1.6; font-family: 'Hiragino Kaku Gothic ProN', sans-serif; }
+    .api-saved { font-size: 10px; color: #5a8a5a; font-family: 'Hiragino Kaku Gothic ProN', sans-serif; }
+    .api-clear { font-size: 10px; color: #a8743a; cursor: pointer; text-decoration: underline; font-family: 'Hiragino Kaku Gothic ProN', sans-serif; background:none; border:none; }
     .btn-generate { width: 100%; border: none; border-radius: 2px; padding: 13px; font-size: 13px; color: #fff; cursor: pointer; letter-spacing: 0.1em; background: #16130f; transition: opacity 0.2s; font-family: 'Hiragino Kaku Gothic ProN', sans-serif; }
     .btn-generate:disabled { opacity: 0.4; cursor: not-allowed; }
     .preview-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 18px; }
@@ -57,11 +59,14 @@
 <div class="container">
 
   <div class="api-box">
-    <div class="api-title">Claude APIキー</div>
-    <input type="password" id="apiKey" placeholder="sk-ant-..." />
+    <div class="api-title">
+      <span>Claude APIキー</span>
+      <span id="apiSavedLabel"></span>
+    </div>
+    <input type="password" id="apiKey" placeholder="sk-ant-..." oninput="onApiInput()" />
     <div class="api-note">
       ※ お客様の印象・エピソードをAIが自然な文章に整えるために使用します。<br>
-      ※ キーはこの画面内でのみ使用され、どこにも保存・送信されません。
+      ※ キーはこの端末のブラウザ内にのみ保存され、外部には送信されません。
     </div>
   </div>
 
@@ -117,8 +122,49 @@
 <script>
   const STORE = "TOD'S 御殿場プレミアムアウトレット店";
   const STORE_SHORT = "TOD'S 御殿場プレミアムアウトレット";
-  const SUBJECT = `ご来店ありがとうございました。（${STORE_SHORT}）`;
+  const SUBJECT = "ご来店ありがとうございました。（" + STORE_SHORT + "）";
+  const API_KEY_STORAGE = "heartful_api_key";
   document.getElementById('subjectText').textContent = SUBJECT;
+
+  // 起動時に保存済みキーを読み込む
+  window.addEventListener('DOMContentLoaded', function() {
+    try {
+      const saved = localStorage.getItem(API_KEY_STORAGE);
+      if (saved) {
+        document.getElementById('apiKey').value = saved;
+        showSavedLabel(true);
+      }
+    } catch(e) {}
+  });
+
+  function showSavedLabel(saved) {
+    const label = document.getElementById('apiSavedLabel');
+    if (saved) {
+      label.innerHTML = '<span class="api-saved">✓ 保存済み</span> <button class="api-clear" onclick="clearApiKey()">削除</button>';
+    } else {
+      label.innerHTML = '';
+    }
+  }
+
+  // キー入力のたびに自動保存
+  function onApiInput() {
+    const key = document.getElementById('apiKey').value.trim();
+    try {
+      if (key) {
+        localStorage.setItem(API_KEY_STORAGE, key);
+        showSavedLabel(true);
+      } else {
+        localStorage.removeItem(API_KEY_STORAGE);
+        showSavedLabel(false);
+      }
+    } catch(e) {}
+  }
+
+  function clearApiKey() {
+    try { localStorage.removeItem(API_KEY_STORAGE); } catch(e) {}
+    document.getElementById('apiKey').value = '';
+    showSavedLabel(false);
+  }
 
   function getDaysPassed(dateStr) {
     if (!dateStr) return null;
@@ -132,10 +178,10 @@
     const hint = document.getElementById('dateHint');
     if (days === null) { hint.textContent = ''; return; }
     if (days <= 3) {
-      hint.textContent = `購入から${days}日経過 → 「この度は〜ございます」`;
+      hint.textContent = "購入から" + days + "日経過 → 「この度は〜ございます」";
       hint.className = 'date-hint hint-recent';
     } else {
-      hint.textContent = `購入から${days}日経過 → 「先日は〜ございました」`;
+      hint.textContent = "購入から" + days + "日経過 → 「先日は〜ございました」";
       hint.className = 'date-hint hint-past';
     }
   }
@@ -157,32 +203,29 @@
 
     const days = getDaysPassed(dateStr);
     const greeting = (days !== null && days <= 3)
-      ? `この度は${STORE}をご利用いただき誠にありがとうございます。`
-      : `先日は${STORE}をご利用いただき誠にありがとうございました。`;
+      ? "この度は" + STORE + "をご利用いただき誠にありがとうございます。"
+      : "先日は" + STORE + "をご利用いただき誠にありがとうございました。";
 
     genBtn.disabled = true;
     status.textContent = '';
     document.getElementById('preview').innerHTML = '<span class="loading">AIが文章を整えています…</span>';
 
-    const prompt = `あなたはTOD'Sの販売スタッフです。来店されたお客様へ送るハートフルレター（お礼メール）の本文を作成してください。
-
-【お客様情報】
-- お客様の姓：${lastName}
-- 購入商品：${product}
-- お客様の印象（メモ）：${impression || '（記載なし）'}
-- 来店エピソード（メモ）：${episode || '（記載なし）'}
-
-【文体ルール（厳守）】
-- 文頭に「・」や箇条書き記号は絶対に使わない。自然な段落の文章にする。
-- 堅すぎず、温かみのある丁寧な日本語にする。
-- 以下の3つの要素を、この順番で、各1〜2文で書く：
-  1：購入商品（${product}）を、お客様の印象・雰囲気と結びつけて「お似合いでした」と伝える文。
-  2：来店エピソードを情景が浮かぶように自然な文にする。「また、」で始めてもよい。
-  3：「末永くご愛用いただけることを願っております。」で締める。
-- メモが雑でも、上品で自然な接客日本語に整えること。
-- 出力は上記3要素の本文のみ。挨拶文・宛名・署名・件名は一切含めない。説明や前置きも書かない。
-
-本文のみを出力してください。`;
+    const prompt = "あなたはTOD'Sの販売スタッフです。来店されたお客様へ送るハートフルレター（お礼メール）の本文を作成してください。\n\n"
+      + "【お客様情報】\n"
+      + "- お客様の姓：" + lastName + "\n"
+      + "- 購入商品：" + product + "\n"
+      + "- お客様の印象（メモ）：" + (impression || '（記載なし）') + "\n"
+      + "- 来店エピソード（メモ）：" + (episode || '（記載なし）') + "\n\n"
+      + "【文体ルール（厳守）】\n"
+      + "- 文頭に「・」や箇条書き記号は絶対に使わない。自然な段落の文章にする。\n"
+      + "- 堅すぎず、温かみのある丁寧な日本語にする。\n"
+      + "- 以下の3つの要素を、この順番で書く：\n"
+      + "  1：購入商品（" + product + "）を、お客様の印象・雰囲気と結びつけて「お似合いでした」と伝える文（1〜2文）。\n"
+      + "  2：来店エピソードを情景が浮かぶように自然な文にする。「また、」で始めてもよい（1〜2文）。\n"
+      + "  3：「末永くご愛用いただけることを願っております。」で締める。\n"
+      + "- メモが雑でも、上品で自然な接客日本語に整えること。\n"
+      + "- 出力は上記3要素の本文のみ。挨拶文・宛名・署名・件名は一切含めない。説明や前置きも書かない。\n\n"
+      + "本文のみを出力してください。";
 
     try {
       const res = await fetch("https://api.anthropic.com/v1/messages", {
@@ -194,38 +237,41 @@
           "anthropic-dangerous-direct-browser-access": "true"
         },
         body: JSON.stringify({
-          model: "claude-sonnet-4-6",
+          model: "claude-sonnet-4-20250514",
           max_tokens: 1000,
           messages: [{ role: "user", content: prompt }]
         })
       });
 
-      if (!res.ok) { throw new Error(`APIエラー (${res.status})`); }
+      if (!res.ok) {
+        let msg = "APIエラー (" + res.status + ")";
+        try { const err = await res.json(); if (err && err.error && err.error.message) msg += "：" + err.error.message; } catch(e){}
+        throw new Error(msg);
+      }
 
       const data = await res.json();
-      const aiBody = data.content.filter(b => b.type === "text").map(b => b.text).join("\n").trim();
+      let aiBody = "";
+      if (data && Array.isArray(data.content)) {
+        aiBody = data.content.filter(function(b){ return b.type === "text"; }).map(function(b){ return b.text; }).join("\n").trim();
+      }
+      if (!aiBody) { throw new Error("文章を取得できませんでした。もう一度お試しください。"); }
+
       const customerName = [lastName, firstName].filter(Boolean).join(' ') + '様';
       const fullBody =
-`${customerName}
-
-${greeting}
-
-${aiBody}
-
-ご不明な点や気になる点がございましたら、私、${staff || '○○'}までお気軽にお問い合わせください。
-
-また、${lastName}様にお会いできることを心よりお待ち申し上げております。
-
-
-${STORE}`;
+        customerName + "\n\n" +
+        greeting + "\n\n" +
+        aiBody + "\n\n" +
+        "ご不明な点や気になる点がございましたら、私、" + (staff || '○○') + "までお気軽にお問い合わせください。\n\n" +
+        "また、" + lastName + "様にお会いできることを心よりお待ち申し上げております。\n\n\n" +
+        STORE;
 
       document.getElementById('preview').textContent = fullBody;
-      window._fullText = `件名：${SUBJECT}\n\n\n${fullBody}`;
+      window._fullText = "件名：" + SUBJECT + "\n\n\n" + fullBody;
       status.textContent = '✓ 作成しました。';
       status.style.color = '#5a8a5a';
     } catch (e) {
       document.getElementById('preview').textContent = '';
-      status.textContent = '⚠ ' + e.message + '（APIキーや通信状況をご確認ください）';
+      status.textContent = '⚠ ' + e.message;
       status.style.color = '#a8743a';
     } finally {
       genBtn.disabled = false;
@@ -233,7 +279,7 @@ ${STORE}`;
   }
 
   function resetForm() {
-    ['lastName','firstName','purchaseDate','product','impression','episode','staffName'].forEach(id => document.getElementById(id).value = '');
+    ['lastName','firstName','purchaseDate','product','impression','episode','staffName'].forEach(function(id){ document.getElementById(id).value = ''; });
     document.getElementById('dateHint').textContent = '';
     document.getElementById('preview').textContent = '';
     document.getElementById('status').textContent = '';
@@ -242,11 +288,11 @@ ${STORE}`;
 
   function copyText() {
     if (!window._fullText) return;
-    navigator.clipboard.writeText(window._fullText).then(() => {
+    navigator.clipboard.writeText(window._fullText).then(function(){
       const btn = document.getElementById('copyBtn');
       btn.textContent = 'コピーしました ✓';
       btn.classList.add('copied');
-      setTimeout(() => { btn.textContent = '全文コピー'; btn.classList.remove('copied'); }, 2000);
+      setTimeout(function(){ btn.textContent = '全文コピー'; btn.classList.remove('copied'); }, 2000);
     });
   }
 </script>
